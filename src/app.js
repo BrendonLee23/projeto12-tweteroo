@@ -3,7 +3,6 @@ import cors from "cors";
 
 const loginInfos = [];
 const arrayTweets = [];
-const lastArray = [];
 
 const app = express();
 app.use(express.json());
@@ -25,10 +24,8 @@ app.post('/sign-up', (req, res) => {
 app.post('/tweets', (req, res) => {
     const { username, tweet } = req.body
 
-    /*     const userExists = loginInfos.some(user => user.username === username); */
-
-    if (loginInfos.includes(username)) {
-        arrayTweets.push(
+    if (loginInfos.find(info => info.username === username)) {
+        arrayTweets.unshift(
             {
                 username: username,
                 tweet: tweet
@@ -41,25 +38,27 @@ app.post('/tweets', (req, res) => {
 })
 
 app.get('/tweets', (req, res) => {
-    const { tweet } = req.body;
-    lastArray.push(
-        [
-            {
-                username: tweet.username,
-                avatar: tweet.avatar,
-                tweet: tweet.tweet
-            }
-        ]
-    )
 
-    if (lastArray.length > 10) {
+    const novoArray = arrayTweets.map(tweetObj => {
+        const { username, tweet } = tweetObj;
+        const { avatar } = loginInfos.find(info => info.username === username);
+
+        return {
+            username,
+            avatar,
+            tweet
+        };
+    });
+
+
+    if (novoArray.length > 10) {
         // a função slice retorna os últimos 10 elementos
-        const lastTenTweets = lastArray.slice(-10);
+        const lastTenTweets = novoArray.slice(-10);
         res.json(lastTenTweets);
-    } else if(lastArray.length < 10){
-        // Caso tenha menos de 10 elementos, retorne o lastArray completo
-        res.json(lastArray);
-    } else{
+    } else if (novoArray.length < 10) {
+        // Caso tenha menos de 10 elementos, retorne o novoArray completo
+        res.json(novoArray);
+    } else {
         res.json([])
     }
 })
