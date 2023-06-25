@@ -53,9 +53,9 @@ app.get('/tweets', (req, res) => {
 
     if (novoArray.length > 10) {
         // a função slice retorna os últimos 10 elementos
-        const lastTenTweets = novoArray.slice(-10);
+        const lastTenTweets = novoArray.slice(0,10);
         res.json(lastTenTweets);
-    } else if (novoArray.length < 10) {
+    } else if (novoArray.length <= 10) {
         // Caso tenha menos de 10 elementos, retorne o novoArray completo
         res.json(novoArray);
     } else {
